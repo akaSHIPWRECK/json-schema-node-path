@@ -5,36 +5,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     extractButton.addEventListener('click', function() {
         const schema = jsonSchemaInput.value;
-        const format = document.querySelector('input[name="format"]:checked').value;
-        const paths = extractPaths(schema, format); // Implement this function
+        const paths = extractPaths(schema); // Implement this function
         resultOutput.textContent = paths;
     });
 
-    function extractPaths(schema, format) {
-        try {
-            const parsedSchema = JSON.parse(schema);
+    function extractPaths(schema) {
+    try {
+        const parsedSchema = JSON.parse(schema);
+        const paths = [];
 
-            const paths = [];
-
-            function traverse(obj, currentPath) {
+        function traverse(obj, currentPath) {
+            if (typeof obj === 'object') {
+                paths.push(currentPath);
                 for (const key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        const newPath = currentPath === '' ? key : `${currentPath}.${key}`;
-                        paths.push(format === 'slash' ? newPath.replace(/\./g, '/') : newPath);
-
-                        if (typeof obj[key] === 'object') {
-                            traverse(obj[key], newPath);
-                        }
+                    if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
+                        traverse(obj[key], currentPath === '' ? key : `${currentPath}.${key}`);
                     }
                 }
             }
-
-            traverse(parsedSchema, '');
-
-            return paths.join('\n');
-        } catch (error) {
-            console.error(error);
-            return 'Error occurred while parsing JSON schema.';
         }
+
+        traverse(parsedSchema, '');
+
+        return paths.join('\n');
+    } catch (error) {
+        console.error(error);
+        return 'Error occurred while parsing JSON schema.';
     }
+}
 });

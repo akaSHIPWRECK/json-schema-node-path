@@ -2,12 +2,55 @@
 <html>
 <head>
     <title>JSON Path Extractor</title>
+    <style>
+        /* Apply CSS to create side-by-side text areas and position the button */
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-rows: 1fr auto;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        #jsonSchema,
+        #resultOutput {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            resize: none;
+            overflow: auto;
+        }
+
+        #jsonSchema {
+            order: 1;
+        }
+
+        #resultOutput {
+            order: 2;
+        }
+
+        #extractButton {
+            grid-row: 2;
+            grid-column: 1 / -1;
+            justify-self: center;
+        }
+    </style>
 </head>
 <body>
     <h1>JSON Path Extractor</h1>
-    <textarea id="jsonSchema" placeholder="Enter JSON schema here"></textarea>
-    <button id="extractButton">Extract Paths</button>
-    <pre id="resultOutput"></pre>
+    <div class="main-container">
+        <textarea id="jsonSchema" placeholder="Enter JSON schema here"></textarea>
+        <textarea id="resultOutput" placeholder="Resulting paths will appear here" readonly></textarea>
+        <button id="extractButton">Extract Paths</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

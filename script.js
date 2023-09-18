@@ -5,8 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     extractButton.addEventListener('click', function() {
         const schema = jsonSchemaInput.value;
-        const paths = parseSchema(JSON.parse(schema));
-        resultOutput.textContent = paths;
+        try {
+            const paths = parseSchema(JSON.parse(schema));
+            resultOutput.textContent = paths;
+        } catch (error) {
+            resultOutput.textContent = 'Error: ' + error.message;
+        }
     });
 
     function parseSchema(schema, parentPath = "") {
@@ -14,6 +18,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const result = [];
 
         function traverseDef(name, propRef) {
+            if (!allDef[propRef]) {
+                throw new Error(`Definition not found: ${propRef}`);
+            }
+
             if (allDef[propRef].properties) {
                 const paths = [];
                 for (const key in allDef[propRef].properties) {

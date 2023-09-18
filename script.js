@@ -13,13 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const allDef = schema.definitions;
         const result = [];
 
-        function traverseDef(name) {
-            if (allDef[name].properties) {
+        function traverseDef(name, propRef) {
+            if (allDef[propRef].properties) {
                 const paths = [];
-                for (const key in allDef[name].properties) {
-                    if (allDef[name].properties[key].$ref) {
-                        const propRef = allDef[name].properties[key].$ref.split('/').pop();
-                        const subPaths = traverseDef(propRef);
+                for (const key in allDef[propRef].properties) {
+                    if (allDef[propRef].properties[key].$ref) {
+                        const ref = allDef[propRef].properties[key].$ref.split('/').pop();
+                        const subPaths = traverseDef(key, ref);
                         paths.push(...subPaths.map(subPath => name + '.' + subPath));
                     } else {
                         paths.push(name + '.' + key);
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (schema.properties) {
             for (const propName in schema.properties) {
                 const propRef = schema.properties[propName].$ref.split('/').pop();
-                const paths = traverseDef(propRef);
+                const paths = traverseDef(propName, propRef);
                 result.push(...paths);
             }
         }

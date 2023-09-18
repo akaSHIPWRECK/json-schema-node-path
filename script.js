@@ -5,32 +5,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     extractButton.addEventListener('click', function() {
         const schema = jsonSchemaInput.value;
-        const paths = extractPaths(schema); // Implement this function
+        const paths = parseSchema(JSON.parse(schema));
         resultOutput.textContent = paths;
     });
 
-    function extractPaths(schema) {
-    try {
-        const parsedSchema = JSON.parse(schema);
-        const paths = [];
+    function parseSchema(schema, parentPath = "") {
+        const allDef = schema.definitions;
+        const result = [];
 
-        function traverse(obj, currentPath) {
-            if (typeof obj === 'object') {
-                paths.push(currentPath);
-                for (const key in obj) {
-                    if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
-                        traverse(obj[key], currentPath === '' ? key : `${currentPath}.${key}`);
+        function traverseDef(name) {
+            if (allDef[name].properties) {
+                const paths = [];
+                for (const key in allDef[name].properties) {
+                    if (allDef[name].properties[key].$ref) {
+                        const propRef = allDef[name].properties[key].$ref.split('/').pop();
+                        const subPaths = traverseDef(propRef);
+                        paths.push(...subPaths.map(subPath => name + '.' + subPath));
+                    } else {
+                        paths.push(name + '.' + key);
                     }
                 }
+                return paths;
+            } else {
+                return [name];
             }
         }
 
-        traverse(parsedSchema, '');
+        if (schema.properties) {
+            for (const propName in schema.properties) {
+                const propRef = schema.properties[propName].$ref.split('/').pop();
+                const paths = traverseDef(propRef);
+                result.push(...paths);
+            }
+        }
 
-        return paths.join('\n');
-    } catch (error) {
-        console.error(error);
-        return 'Error occurred while parsing JSON schema.';
+        return result.join('\n');
     }
-}
 });

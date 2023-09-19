@@ -34,7 +34,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 return paths;
-            } else {
+            } else if (allDef[propRef].items){
+                const paths = [];
+                for (const key in allDef[propRef].items.properties) {
+                    if (allDef[propRef].items.properties[key].$ref) {
+                        const ref = allDef[propRef].items.properties[key].$ref.split('/').pop();
+                        const subPaths = traverseDef(key, ref);
+                        paths.push(...subPaths.map(subPath => name + '.' + subPath));
+                    } else {
+                        paths.push(name + '.' + key);
+                    }
+                }
+                return paths;
+            } 
+            else {
                 return [name];
             }
         }

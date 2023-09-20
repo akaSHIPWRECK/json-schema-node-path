@@ -46,7 +46,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 return paths;
-            } 
+            } else if (allDef[propRef].oneOf){
+                const paths = [];
+                for (const obj of allDef[propRef].oneOf) {
+                    if (obj.$ref){
+                        const ref = obj.$ref.split('/').pop();
+                        const subPaths = traverseDef(name, ref);
+                        paths.push(...subPaths);
+                    }
+                }    
+                return paths;
+            }     
             else {
                 return [name];
             }
